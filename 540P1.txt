@@ -1,0 +1,115 @@
+CREATE TABLE classification (
+	code varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
+	PRIMARY KEY (code, name)
+);
+
+CREATE TABLE addresses (
+	id int NOT NULL,
+	number int NOT NULL,
+	street varchar(100) NOT NULL,
+	city varchar(100) NOT NULL,
+	state varchar(100) NOT NULL,
+	country varchar(100) NOT NULL,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE facilities (
+	id int NOT NULL,
+	name varchar(100) NOT NULL,
+	capacity int NOT NULL,
+	classification_code varchar(100) NOT NULL,
+	address_id int NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (classification_code) REFERENCES classification(code),
+	FOREIGN KEY (address_id) REFERENCES addresses(id)
+);
+
+CREATE TABLE certifications (
+	acronym varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
+	PRIMARY KEY (acronym)
+);
+
+CREATE TABLE facility_certifications (
+	facility_id int NOT NULL,
+	certification_acronym varchar(100) NOT NULL,
+	certification_date DATE NOT NULL,
+	expiration_date DATE NOT NULL,
+	PRIMARY KEY (facility_id, certification_acronym),
+	FOREIGN KEY (facility_id) REFERENCES facilities(id),
+	FOREIGN KEY (certification_acronym) REFERENCES certifications(acronym)
+);
+
+CREATE TABLE staff (
+	id int NOT NULL,
+	name varchar(100) NOT NULL,
+	designation varchar(100) NOT NULL,
+	hire_date DATE NOT NULL,
+	facility_id int NOT NULL,
+	primary_department_code varchar(100) NOT NULL,
+	username varchar(100) NOT NULL,
+	password varchar(100) NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (facility_id) REFERENCES facilities(id)
+);
+
+CREATE TABLE departments (
+	code varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
+	type varchar(100) NOT NULL,
+	facility_id int NOT NULL,
+	director_id int NOT NULL,
+	PRIMARY KEY (code),
+	FOREIGN KEY (facility_id) REFERENCES facility(id),
+	FOREIGN KEY (director_id) REFERENCES staff(id)
+);
+
+ALTER TABLE staff
+	ADD FOREIGN KEY (primary_department_code) REFERENCES departments(code);
+
+CREATE TABLE staff_secondary_departments (
+	staff_id int NOT NULL,
+	department_code varchar(100) NOT NULL,
+	PRIMARY KEY (staff_id, department_code),
+	FOREIGN KEY (staff_id) REFERENCES staff(id),
+	FOREIGN KEY (department_code) REFERENCES departments(code)
+);
+
+CREATE TABLE service (
+	code varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
+	PRIMARY KEY (code)
+);
+
+CREATE TABLE department_services (
+	department_code varchar(100) NOT NULL,
+	service_code varchar(100) NOT NULL,
+	PRIMARY KEY (department_code, service_code),
+	FOREIGN KEY (department_code) REFERENCES departments(code),
+	FOREIGN KEY (service_code) REFERENCES service(code)
+);
+
+CREATE TABLE equipment (
+	name varchar(100) NOT NULL,
+	PRIMARY KEY (name)
+);
+
+CREATE TABLE service_equipment (
+	service_code varchar(100) NOT NULL,
+	name varchar(100) NOT NULL,
+	PRIMARY KEY (service_code, name),
+	FOREIGN KEY (service_code) REFERENCES service(code),
+	FOREIGN KEY (name) REFERENCES equipment(name)
+);
+
+CREATE TABLE patients (
+	id int NOT NULL,
+	first_name varchar(100) NOT NULL,
+	last_name varchar(100) NOT NULL,
+	dob DATE NOT NULL,
+	phone varchar(100) NOT NULL,
+	address_id int NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (address_id) REFERENCES addresses(id)
+);
